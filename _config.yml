@@ -3,11 +3,11 @@ title: Jimmy Blog
 SEOTitle: 瘸子林的博客 | Jimmy Blog
 header-img: img/post-bg-desk.jpg
 email: binglin1219@163.com
-description: "进击的职场菜鸟."
+description: "Talk is cheap, Show me the code."
 keyword: "Jimmy, Jimmy Blog, 瘸子林的博客, 林丙, linbing, iOS, Apple, iPhone"
-url: "http://linbing.github.io"          # your host, for absolute URL
+url: "http://linbing1219.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
-github_repo: "https://github.com/linbing1219/linbing.github.io.git" # you code repository
+github_repo: "https://github.com/linbing1219/linbing1219.github.io.git" # you code repository
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
