@@ -12,7 +12,7 @@ github_repo: "https://github.com/linbing1219/linbing1219.github.io.git" # you co
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
 sidebar-about-description: "Talk is cheap, Show me the code."
-sidebar-avatar: /img/about-BY-gentle.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-avatar: /img/about_me.jpeg     # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
@@ -21,8 +21,8 @@ RSS: false
 # weibo_username:     qiubaiying
 zhihu_username:     linbing1219
 github_username:    linbing1219
-facebook_username:  
-jianshu_username:   
+facebook_username:
+jianshu_username:
 #twitter_username:   qiubaiying
 
 
