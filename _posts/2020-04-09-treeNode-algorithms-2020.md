@@ -1,424 +1,327 @@
 ---
 layout:     post
-title:      数据结构及算法--链表
-subtitle:    "\"list node\""
-date:       2020-04-07
+title:      数据结构及算法--二叉树
+subtitle:    "\"tree node\""
+date:       2020-04-09
 author:     Jimmy
 header-img: img/post-bg-2015.jpg
 catalog: true
 tags:
-    - ListNode
+    - TreeNode
 ---
 
-#### 双指针场景
+#### 非递归遍历二叉树
 
 ```
-package com.huawei.mrs.linkedList;
-
-public class TwoPointer {
-    /**
-     * 环形链表
-     * 给定一个链表，判断链表中是否有环。
-     * 为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
-     * 思路：
-     * 使用快慢指针来遍历，快指针每次移动2步，慢指针每次移动一步，如果环存在且长度为M，那么M次迭代后，快指针必比慢指针多绕环一周
-     */
-    public boolean hasCycle(ListNode head) {
-        ListNode walker = head;  //慢指针
-        ListNode runner = head;  //快指针
-        while (runner != null && runner.next != null) {
-            walker = walker.next;
-            runner = runner.next.next;
-            if (walker == runner) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 环形链表 II
-     * 给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
-     * 为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
-     * 说明：不允许修改给定的链表。
+/**
+     * 二叉树的前序遍历(根、左、右)
+     * 给定一个二叉树，返回它的 前序 遍历。
      *
-     * 主要思想是：1、用快慢指针先找到交叉点
-     * 2、两个指针，一个从head开始遍历，一个从cross遍历，返回交叉点
-     * @param head
-     * @return
-     */
-    public ListNode detectCycle(ListNode head) {
-        ListNode walker = head;
-        ListNode runner = head;
-        while (runner != null && runner.next != null) {
-            walker = walker.next;
-            runner = runner.next.next;
-            if (walker == runner) {
-                break;
-            }
-        }
-        if (runner == null || runner.next == null) {
-            return null;
-        }
-        ListNode headWalker = head;
-        ListNode crossWalker = walker;
-        while (headWalker != crossWalker) {
-            headWalker = headWalker.next;
-            crossWalker = crossWalker.next;
-        }
-        return headWalker;
-    }
-
-    /**
-     * 求链表环的长度，如果不存在环，则返回0
-     * 快慢指针找到交叉点后，继续从该交叉点开始遍历并计数，直到下次重新相遇
-     * @param head
-     * @return
-     */
-    public int cycleLen(ListNode head) {
-        ListNode walker = head;
-        ListNode runner = head;
-        while (runner != null && runner.next != null) {
-            walker = walker.next;
-            runner = runner.next.next;
-            if (walker == runner) {
-                break;
-            }
-        }
-        int len = 0;
-        while (runner != null && runner.next != null) {
-            len ++;
-            walker = walker.next;
-            runner = runner.next.next;
-            if (walker == runner) {
-                break;
-            }
-        }
-        return len;
-    }
-
-    /**
-     * 相交链表
-     * 编写一个程序，找到两个单链表相交的起始节点。
-     * 思路：主要是要解决两个链表长度不一致的问题，填充长度：A+B，B+A
-     * @param headA
-     * @param headB
-     * @return
-     */
-    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
-        if (headA == null || headB == null) {
-            return null;
-        }
-        ListNode pa = headA;
-        ListNode pb = headB;
-        while (pa != pb) {
-            pa = pa == null ? headB : pa.next;
-            pb = pb == null ? headA : pb.next;
-        }
-        return pa;
-    }
-
-    /**
-     * 删除链表的倒数第N个节点
-     * 给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。
-     * 快指针先走n步，然后两个指针一起走，快指针到最后一个节点位置即可
-     * @param head
-     * @param n
-     * @return
-     */
-    public ListNode removeNthFromEnd(ListNode head, int n) {
-        ListNode first = head;
-        ListNode second = head;
-        while (n > 0) {
-            second = second.next;
-            n--;
-        }
-        if (second == null) {
-            return head.next;
-        }
-        while (second.next != null) {
-            first = first.next;
-            second = second.next;
-        }
-        first.next = first.next.next;
-        return head;
-    }
-
-}
-```
-
-
-#### 其他经典场景
-
-```
-package com.huawei.mrs.linkedList;
-
-import java.util.Stack;
-
-public class ClassicProblems {
-    /**
-     * 反转链表：反转一个单链表。
-     * 解决方法：
-     * 1、如果没有要求空间复杂度的做法的话，直接用stack，先遍历链表入栈，然后出栈构造新的链表
-     * 2、如果要求空间复杂度为O（1），那就不停地将head的next节点移到head前即可
-     * @param head
-     * @return
-     */
-    public ListNode reverseList(ListNode head) {
-        if (head == null || head.next == null) {
-            return head;
-        }
-        ListNode preNode = null;
-        ListNode nextNode = null;
-        while (head != null) {
-            nextNode = head.next;
-            head.next = preNode;
-            preNode = head;
-            head = nextNode;
-        }
-        return preNode;
-    }
-
-    /**
-     * 移除链表元素：删除链表中等于给定值 val 的所有节点。
-     * 解决思路：新建一个哑节点，next指向head；pre指向哑节点；pre和cur进行同步操作
-     * @param head
-     * @param val
-     * @return
-     */
-    public ListNode removeElements(ListNode head, int val) {
-        ListNode dummy = new ListNode(0);
-        dummy.next = head;
-        ListNode curNode = head;
-        ListNode preNode = dummy;
-        while (curNode != null) {
-            if (curNode.val == val) {
-                preNode.next = curNode.next;
-            } else {
-                preNode = preNode.next;
-            }
-            curNode = curNode.next;
-        }
-        return dummy.next;
-    }
-
-
-    /**
-     * 回文链表
-     * 输入: 1->2
-     * 输出: false
+     * 输入: [1,null,2,3]
+     *    1
+     *     \
+     *      2
+     *     /
+     *    3
      *
-     * 输入: 1->2->2->1
-     * 输出: true
-     * 两种实现方式：
-     * （1）使用stack来存储链表的前半部分，然后遍历后半部分比较
-     * @param head
+     * 输出: [1,2,3]
+     *
+     * 实现方式：
+     * （1）递归：root先加到结果数组中，然后递归左子数，然后递归右子树
+     * （2）迭代：用到了stack，从根节点开始，每次迭代弹出当前栈顶元素，并将其孩子节点压入栈中，先压右孩子再压左孩子
+     * @param root
      * @return
      */
-    public boolean isPalindrome(ListNode head) {
-        if (head == null || head.next == null) {
+    // 迭代实现
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+
+        if (root == null) {
+            return res;
+        }
+        stack.add(root);
+        while (!stack.isEmpty()) {
+            TreeNode node = stack.pop();
+            res.add(node.val);
+            if (node.right != null) {
+                stack.add(node.right);
+            }
+            if (node.left != null) {
+                stack.add(node.left);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 中序遍历二叉树 (左，根，右)
+     * 给定一个二叉树，返回它的中序 遍历。
+     * 输入: [1,null,2,3]
+     *    1
+     *     \
+     *      2
+     *     /
+     *    3
+     *
+     * 输出: [1,3,2]
+     *
+     * 实现方式：
+     * 先把左子树都压入栈中，然后再压右子树
+     * @param root
+     * @return
+     */
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode cur = root;
+
+        while (cur != null || !stack.isEmpty()) {
+            while (cur != null) {
+                stack.add(cur);
+                cur = cur.left;
+            }
+            cur = stack.pop();
+            res.add(cur.val);
+            cur = cur.right;
+        }
+        return res;
+    }
+
+    /**
+     * 二叉树的后序遍历（左 右 根）
+     * 给定一个二叉树，返回它的 后序 遍历
+     * 输入: [1,null,2,3]
+     *    1
+     *     \
+     *      2
+     *     /
+     *    3
+     *
+     * 输出: [3,2,1]
+     *
+     * 实现方式：
+     * 借鉴前序的做法，来个根 右 左的结果逆转即可
+     *
+     * @param root
+     * @return
+     */
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+
+        if (root == null) {
+            return res;
+        }
+        stack.add(root);
+
+        while (!stack.isEmpty()) {
+            TreeNode node = stack.pop();
+            res.add(node.val);
+            if (node.left != null) {
+                stack.add(node.left);
+            }
+            if (node.right != null) {
+                stack.add(node.right);
+            }
+        }
+        // 逆转下
+        Collections.reverse(res);
+        return res;
+    }
+
+    /**
+     * 二叉树的层序遍历
+     * 给你一个二叉树，请你返回其按 层序遍历 得到的节点值。 （即逐层地，从左到右访问所有节点）。
+     * 示例：
+     * 二叉树：[3,9,20,null,null,15,7],
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回其层次遍历结果：
+     *
+     * 实现思路：
+     * 用一个FIFO队列来存每一层的节点，每次操作这一层的节点数的节点即可
+     * [
+     *   [3],
+     *   [9,20],
+     *   [15,7]
+     * ]
+     * @param root
+     * @return
+     */
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (root == null) {
+            return res;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        int levelNum; //记录当前层有多少节点
+
+        while (!queue.isEmpty()) {
+            levelNum = queue.size();
+            List<Integer> levelList = new ArrayList<>();
+            while (levelNum > 0) {
+                TreeNode node = queue.poll();
+                if (node != null) {
+                    levelList.add(node.val);
+                    queue.add(node.left);
+                    queue.add(node.right);
+                }
+                levelNum --;
+            }
+            if (levelList.size() > 0) {
+                res.add(levelList);
+            }
+        }
+        return res;
+    }
+```
+
+#### 递归及其他问题实现
+
+```
+/**
+     * 二叉树的最大深度
+     * 给定一个二叉树，找出其最大深度。
+     *
+     * 二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+     *
+     * 说明: 叶子节点是指没有子节点的节点。
+     *
+     * 示例：
+     * 给定二叉树 [3,9,20,null,null,15,7]，
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回它的最大深度 3 。
+     *
+     * 解决思路：递归
+     * @param root
+     * @return
+     */
+    public int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int maxDepthLeft = maxDepth(root.left);
+        int maxDepthRight = maxDepth(root.right);
+        return Math.max(maxDepthLeft, maxDepthRight) + 1;
+    }
+
+    /**
+     * 对称二叉树
+     * 给定一个二叉树，检查它是否是镜像对称的。
+     * 例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+     *
+     *     1
+     *    / \
+     *   2   2
+     *  / \ / \
+     * 3  4 4  3
+     *
+     * 但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+     *
+     *     1
+     *    / \
+     *   2   2
+     *    \   \
+     *    3    3
+     *
+     * 实现思路：
+     * 对称条件是：根节点相等，左子树的左子树和右子树的右子树相称，左子树的右子树和右子树的左子树相称
+     * @param root
+     * @return
+     */
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) {
             return true;
         }
-        ListNode walker = head;
-        ListNode runner = head;
-        Stack<ListNode> stack = new Stack<>();
-
-        stack.push(walker);
-        while (runner.next != null && runner.next.next != null) {
-            walker = walker.next;
-            runner = runner.next.next;
-            stack.push(walker);
-        }
-        // 链表长度为偶数
-        if (runner.next != null) {
-            walker = walker.next;
-        }
-        while (walker != null) {
-            if (walker.val != stack.pop().val) {
-                return false;
-            }
-            walker = walker.next;
-        }
-        return true;
+        return isSymmetric(root.left, root.right);
     }
 
-    /**
-     * 回文链表
-     * 输入: 1->2
-     * 输出: false
-     *
-     * 输入: 1->2->2->1
-     * 输出: true
-     * 两种实现方式：
-     * （2）找到中点，然后反转链表的后半段，然后与前半段对比
-     * @param head
-     * @return
-     */
-    public boolean isPalindrome1(ListNode head) {
-        if (head == null || head.next == null) {
+    private boolean isSymmetric(TreeNode  left, TreeNode right) {
+        if (left == null && right == null) {
             return true;
+        } else if (left == null || right == null) {
+            return false;
         }
-        ListNode walker = head;
-        ListNode runner = head;
-
-        while (runner.next != null && runner.next.next != null) {
-            walker = walker.next;
-            runner = runner.next.next;
-        }
-
-        ListNode middle = walker;
-        ListNode firstNode = middle.next;
-        ListNode preNode = null;
-        while (firstNode != null) {
-            ListNode next = firstNode.next;
-            firstNode.next = preNode;
-            preNode = firstNode;
-            firstNode = next;
-        }
-        walker = head;
-        runner = preNode;
-
-        while (runner != null) {
-            if (runner.val != walker.val) {
-                return false;
-            }
-            runner = runner.next;
-            walker = walker.next;
-        }
-        return true;
-    }
-
-
-    /**
-     * 合并两个有序链表
-     * 输入：1->2->4, 1->3->4
-     * 输出：1->1->2->3->4->4
-     * 递归实现
-     * @param l1
-     * @param l2
-     * @return
-     */
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-        if (l1 == null) {
-            return l2;
-        }
-        if (l2 == null) {
-            return l1;
-        }
-
-        ListNode head = null;
-        if (l1.val <= l2.val) {
-            head = l1;
-            head.next = mergeTwoLists(l1.next, l2);
-        } else {
-            head = l2;
-            head.next = mergeTwoLists(l1, l2.next);
-        }
-        return head;
+        return left.val == right.val && isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
     }
 
     /**
-     * 两数相加
-     * 输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
-     * 输出：7 -> 0 -> 8
-     * 原因：342 + 465 = 807
-     * @param l1
-     * @param l2
+     * 路径总和
+     * 给定一个二叉树和一个目标和，判断该树中是否存在根节点到叶子节点的路径，这条路径上所有节点值相加等于目标和。
+     *
+     * 说明: 叶子节点是指没有子节点的节点。
+     *
+     * 示例:
+     * 给定如下二叉树，以及目标和 sum = 22，
+     *
+     *               5
+     *              / \
+     *             4   8
+     *            /   / \
+     *           11  13  4
+     *          /  \      \
+     *         7    2      1
+     * 返回 true, 因为存在目标和为 22 的根节点到叶子节点的路径 5->4->11->2。
+     *
+     * @param root
+     * @param sum
      * @return
      */
-    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        if (l1 == null) {
-            return l2;
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null) {
+            return false;
         }
-        if (l2 == null) {
-            return l1;
+        sum -= root.val;
+        if (root.left == null && root.right == null) {
+            return sum == 0;
         }
-        ListNode p = l1, q = l2;
-        ListNode dummy = new ListNode(0);
-        ListNode curNode = dummy;
-        int carry = 0;
-        while (p != null || q != null) {
-            int val1 = (p != null) ? p.val : 0;
-            int val2 = (q != null) ? q.val : 0;
-            int sum = val1 + val2 + carry;
-            carry = sum / 10;
-            curNode.next = new ListNode(sum % 10);
-            curNode = curNode.next;
-
-            if (p != null) {
-                p= p.next;
-            }
-            if (q != null) {
-                q = q.next;
-            }
-        }
-        if (carry > 0) {
-            curNode.next = new ListNode(carry);
-        }
-        return dummy.next;
+        return hasPathSum(root.left, sum) || hasPathSum(root.right, sum);
     }
 
     /**
-     * 旋转链表
-     * 给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
+     * 二叉树的最近公共祖先
+     * 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
      *
-     * 输入: 1->2->3->4->5->NULL, k = 2
-     * 输出: 4->5->1->2->3->NULL
-     * 解释:
-     * 向右旋转 1 步: 5->1->2->3->4->NULL
-     * 向右旋转 2 步: 4->5->1->2->3->NULL
+     * 百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
      *
-     * 输入: 0->1->2->NULL, k = 4
-     * 输出: 2->0->1->NULL
-     * 解释:
-     * 向右旋转 1 步: 2->0->1->NULL
-     * 向右旋转 2 步: 1->2->0->NULL
-     * 向右旋转 3 步: 0->1->2->NULL
-     * 向右旋转 4 步: 2->0->1->NULL
+     * 例如，给定如下二叉树:  root = [3,5,1,6,2,0,8,null,null,7,4]
      *
-     * 解决思路：
-     * 首先遍历链表得到链表长度，然后对k进行处理
-     * 然后快慢指针，找到k的位置，进行操作
+     * 实现思路：
+     * 从根节点开始，分别递归向左子树和右子树查询节点信息。
+     * 递归终止条件：如果当前节点为空或等于p或q，则返回当前节点。
      *
-     * @param head
-     * @param k
+     * 如果左右子树查到节点都不为空，则表明p和q分别在左右子树中，因此，当前节点即为最近公共祖先。
+     * 如果左右子树有一个不为空，则返回非空节点
+     *
+     * @param root
+     * @param p
+     * @param q
      * @return
      */
-    public ListNode rotateRight(ListNode head, int k) {
-        if (head == null || k <= 0) {
-            return head;
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null || root == p || root == q) {
+            return root;
         }
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
 
-        ListNode dummy = new ListNode(0);
-        dummy.next = head;
-
-        ListNode walker = dummy;
-        ListNode runner = dummy;
-        int len = 0;
-        while (walker.next != null) {
-            len ++;
-            walker = walker.next;
+        if (left == null) {
+            return right;
         }
-
-        walker = dummy;
-
-        k = (len + (k % len)) % len;
-        if (k == 0) {
-            return dummy.next;
+        if (right == null) {
+            return left;
         }
-        while (k > 0) {
-            runner = runner.next;
-            k--;
-        }
-        while (runner.next != null) {
-            runner = runner.next;
-            walker = walker.next;
-        }
-
-        dummy.next = walker.next;
-        runner.next = head;
-        walker.next = null;
-        return dummy.next;
+        return root;
     }
-}
 ```
