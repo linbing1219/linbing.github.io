@@ -1,102 +1,211 @@
 ---
 layout:     post
-title:      Redis相关知识
-subtitle:    "\"redis\""
-date:       2020-03-30
+title:      数据结构及算法-排序算法
+subtitle:    "\"sort algorithms\""
+date:       2020-04-01
 author:     Jimmy
 header-img: img/post-bg-2015.jpg
 catalog: true
 tags:
-    - Redis
+    - Algorithms
 ---
 
 
-1、应用场景
-1）Session共享(单点登录)
-2）页面缓存
-3）队列
-4）排行榜/计数器
-5）发布/订阅
+#### 1、快速排序
+
+##### 1.1 代码
+
+```
+package com.huawei.mrs.sort;
+
+import java.util.Arrays;
+
+/**
+ * 快排
+ * 1、选取基准pivot
+ * 2、将所有比基准下的元素放在基准的左边，比基准大的元素放在基准右边
+ * 3、递归
+ */
+public class ForwardQuickSort implements IArraySort {
+    @Override
+    public int[] sort(int[] sourceArray) throws Exception {
+        int[] array = Arrays.copyOf(sourceArray, sourceArray.length);
+        quickSort(array, 0, array.length - 1);
+        return array;
+    }
+
+    private int[] quickSort(int[] array, int left, int right) {
+        if (left < right) {
+            int partitionIndex = partition(array, left, right);
+            quickSort(array, left, partitionIndex - 1);
+            quickSort(array, partitionIndex + 1, right);
+        }
+        return array;
+    }
+
+    private int partition(int[] array, int left, int right) {
+        int pivot = left;
+        int index = pivot + 1;
+        for (int i=index; i<=right; i++) {
+            if (array[i] < array[pivot]) {
+                swap(array, i, index);
+                index ++;
+            }
+        }
+        swap(array, index-1, pivot);
+        return index - 1;
+    }
+
+    private void swap(int[] array, int i, int j) {
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    public static void main(String[] args) {
+        int[] testData = {3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48};
+        try {
+            Arrays.stream(new ForwardQuickSort().sort(testData)).forEach(it -> System.out.println(it));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+*优化点在于，怎么选择基准上，防止坏情况的出现*
+
+##### 1.2 算法改进
+
+- （1）三分取中法：为了解决从首位或者末尾获取到的pivot过于偏激，导致对算法的影响。三分取中法就是取待排序数组的首位数、中位数和末尾数优先进行简单的排序，然后将排序后的值分别按照大小顺序插入原数组的首部，中部和尾部，并取三数中的中值作为基准。
+
+-（2）三向切分快排：解决大量重复元素的排序复杂度未降低的问题，主要做法是记录小于、等于和大于基准值的位置。（荷兰国旗问题）
+
+-（3）双轴快排：两个基准值，分三段进行递归。
+JDK1.8：首先判断数组的长度是否大于286，大于的话就用归并排序；再判断数组的长度是否小于47，小于的话使用插入排序；否则双轴快排。
+
+#### 2、插入排序
+
+算法复杂度：时间复杂度O(n2)，空间复杂度O(1)
+
+基本排序算法中，一般情况下我们直接选择快速排序算法。但在快排分区规模比较小时，我们会改用插入排序算法去排序那个分区的数据。
+
+经验是，小数据量/接近有序的数据进行排序，使用插入排序。
+
+算法改进：数组已经有序部分，查找插入元素位置时，使用二分查找。
+
+#### 3、归并算法
+
+##### 3.1 代码
+
+```
+package com.huawei.mrs.sort;
+
+import java.util.Arrays;
+
+/**
+ * 归并算法：
+ * 1、用到一个临时数组，空间复制度O(n)。时间复制度O(nlogn)
+ */
+public class MergeSort implements IArraySort {
+    @Override
+    public int[] sort(int[] sourceArray) throws Exception {
+        int[] array = Arrays.copyOf(sourceArray, sourceArray.length);
+        if (array.length < 2) {
+            return array;
+        }
+        int middle = (int) Math.floor(array.length / 2);
+        int[] left = Arrays.copyOfRange(array, 0, middle);
+        int[] right = Arrays.copyOfRange(array, middle, array.length);
+
+        return merge(sort(left), sort(right));
+    }
+
+    private int[] merge(int[] left, int[] right) {
+        int[] res = new int[left.length + right.length];
+        int i = 0;
+        while (left.length > 0 && right.length > 0) {
+            if (left[0] <= right[0]) {
+                res[i++] = left[0];
+                left = Arrays.copyOfRange(left, 1, left.length);
+            } else {
+                res[i++] = right[0];
+                right = Arrays.copyOfRange(right, 1, right.length);
+            }
+        }
+        while (left.length > 0) {
+            res[i++] = left[0];
+            left = Arrays.copyOfRange(left, 1, left.length);
+        }
+        while (right.length > 0) {
+            res[i++] = right[0];
+            right = Arrays.copyOfRange(right, 1, right.length);
+        }
+
+        return res;
+    }
+
+    public static void main(String[] args) {
+        int[] testData = {3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48};
+        try {
+            Arrays.stream(new ForwardQuickSort().sort(testData)).forEach(it -> System.out.println(it));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+#### 4、堆排序
+
+堆结构：近似完全二叉树，满足性质：子节点的键值或者索引总是小于/大于其父节点。
+
+大顶堆：每个节点的值都大于其子节点的值，堆排序中用于升序排序；
+小顶堆：每个节点的值都小于其子节点的值，降序排序。
+
+堆排序比较和交换的次数比快速排序多，所以平均而言比快排慢。
+但是针对top K场景，堆排序的优势就出来了。
 
 
-2、Redis与Memcached区别比较
-（1）Redis支持更丰富的数据结构，比如list、set、zset、hash、bitmaps、hyperLog，但是memcached只支持string（新增二进制类型）
-（2）Redis支持数据备份，即master-slave模式的数据备份
-（3）Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启时可以再次加载使用，而memcached把数据全部保存在内存中
-（4）Redis的速度更快（数据存储在内存中，类似于hashMap，查找和操作时间复杂度都是O(1)）
-（5）网络IO模型：Redis是单线程IO复用模型，而memcached是多线程非阻塞IO复用网络模型
+优先队列（JDK中的PriorityQueue）也是堆排序的另一个使用场景，其需要在一组不停更新的数据中找到最大/最小元素。
 
-3、怎么保证Redis中的数据都是热点数据？Redis有哪些数据淘汰策略？
-（1）volatile-lru：从已设置过期时间的数据集中选择最近最少使用的数据淘汰
-（2）volatile-ttl：从已设置过期时间的数据集中选择将要过期的数据淘汰
-（3）volatile-random：从已设置过期时间的数据集中任意选择数据淘汰
-（4）allkeys-lru：从数据集中选择最近最少用的数据淘汰
-（5）allkeys-random：从数据集中任意选择数据淘汰
-（6）no-enviction：禁止淘汰，返回错误
+#### 5、外排算法
 
-4、Redis并发竞争问题？
+算法引入   http://data.biancheng.net/out_sort/
+当待排序的文件大小比内存的可用容量还大时，文件无法一次性放到内存中进行排序，需要借助于外部存储器。
 
-5、Redis内存回收算法：LRU（hashMap+双向链表的实现）
-
-6、Redis分区？
-优点：扩展计算能力；允许构造更大的数据库
-缺点：涉及多个key操作不被允许；涉及多个key的事务不被支持；数据处理更加复杂；增加或者删除容量也比较复杂
-
-分区类型：
-范围分区：0-10000分配在实例1；10001-20000分配在实例2，缺点是需要维护一个区间范围到实例的映射表
-哈希分区：涉及到一致性hash的问题
+外部排序算法有两个阶段组成：
+1、按照内存大小，将大文件分成若干个长度为l的子文件（l小于内存可用容量），然后将各个子文件依次读入内存，使用适当的内排算法对其进行排序（排好序的子文件统称为归并段或者顺段），将排好序的归并段写入外存，为下一个子文件排序腾出内存空间。
+2、对得到的归并段进行合并，直至得到整个有序的文件为止。
 
 
-7、持久化方式
-（1）RDB快照存储
-（2）AOF追加文件存储
+注意：在实际归并的过程中，由于内存容量的限制不能满足同时将 2 个归并段全部完整的读入内存进行归并，只能不断地取 2 个归并段中的每一小部分进行归并，通过不断地读数据和向外存写数据，直至 2 个归并段完成归并变为 1 个大的有序文件。
 
-8、Redis集群方案怎么做？
-1、codis，目前用的最多的集群方案，支持在节点数量改变的情况下，旧节点数据可恢复到新的hash节点。
-2、redis cluster3.0自带集群，分布式算法不是一致性hash，而是hash槽的概念，以及自身支持设置从节点
-3、从业务代码层实现
+对于外部排序算法而言，影响整体排序效率的因素主要取决于读取外存的次数，即访问外存的次数越多，算法花费时间就越多，效率就越低。那么，对于同一个文件来说，对其进行外部排序访问外存的次数与归并次数成正比，即归并的次数越多，访问外存的次数就越多。
 
-1、Redis缓存的数据一致性
-数据分为最终一致和强一致性，redis无法保存强一致性。
+一般情况下，对于具有m个初始归并段进行k-路平衡归并时，归并的次数为s=⌊logk m⌋（其中 s 表示归并次数）。
+所以想要达到减少归并次数从而提高算法效率的目的，可以从两个角度实现：
+1、增加k-路平衡归并中的k值
+2、尽量减少初始归并段的数量m，即增加每个归并段的容量。
 
-写操作：先清除缓存，再更新数据库，在更新缓存。
-读操作：查询缓存，命中则直接返回；否则查询数据库，更新缓存，返回结果
+多路平衡归并算法
 
-但是对于并发读写操作，需要对key使用分布式锁来保证数据的一致性。
+k并不是越大越好，因为k越大，虽然会减少读写外存数据的次数，但会增加内部归并时间。
 
-2、Redis过期淘汰
-存储数据的时候可以设置过期时间，redis的过期删除采用的是定时删除，默认100ms检查一次，随机检查key是否过期，遇到过期的key就直接删除，这样操作有漏网之鱼。
-redis还存在一种惰性删除策略，当我们去读写一个已经过期的key时，直接删除过期的key。
+为了避免在增加k值的过程中影响内部归并的效率，在进行k-路归并时可以使用“败者树”来实现，该方法在增加k值时不会影响其内部归并的效率。
 
-内存淘汰涉及淘汰策略。
+胜者树和败者树的区别就是：胜者树中的非终端结点中存储的是胜利的一方；而败者树中的非终端结点存储的是失败的一方。而在比较过程中，都是拿胜者去比较。
 
-3、缓存穿透
-大量请求查询数据库中不存在的数据，缓存中查不到该数据，数据库由于压力大而垮掉。
 
-解决方案：
-（1）缓存空值：将不存在key对应的值设置为null丢到缓存中，下次再次查询该key时直接返回null。适合重复查询不存在数据的场景。
+置换选择排序算法
 
-（2）布尔过滤器
-
-4、缓存击穿
-
-在高并发的系统中，大量的请求同时查询一个key，而该key此时正好失效了，就会导致大量的请求打到数据库上去。
-
-使用互斥锁锁住第一个查询请求，其他线程等第一个线程查询到了数据并做了缓存后查询，走缓存。
-
-5、缓存雪崩
-
-某一时刻发生大规模缓存失效，比如缓存服务宕机。
-
-（1）使用集群缓存，保证缓存服务高可用
-（2）ehcache本地缓存+hystrix限流&降级
-（3）开启redis持久化机制，尽快恢复缓存集群
+目的是减小m的值。
 
 
 
-6、热点数据集中失效？
+最佳归并树
 
-（1）设置不同的失效时间，让缓存的过期时间错开
-（2）互斥锁
+无论是等分还是置换选择排序得到的归并段，如何设置他们的归并顺序，可以得到对外存的访问次数降到最低？
 
-
+构造霍夫曼树（带权路径长度最短的二叉树）
