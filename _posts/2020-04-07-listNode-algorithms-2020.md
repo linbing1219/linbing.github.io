@@ -420,5 +420,69 @@ public class ClassicProblems {
         walker.next = null;
         return dummy.next;
     }
+    
+    /**
+     * 排序链表
+     * 在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。
+     *
+     * 示例 1:
+     *
+     * 输入: 4->2->1->3
+     * 输出: 1->2->3->4
+     * 示例 2:
+     *
+     * 输入: -1->5->3->4->0
+     * 输出: -1->0->3->4->5
+     *
+     * 实现思路：归并
+     * 1、首先是快慢指针到到中间节点，然后对前后进行排序，最后进行两个有序链表的合并操作
+     * @param head
+     * @return
+     */
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        ListNode middle = findMiddleNode(head);
+        ListNode rightList = middle.next;
+        middle.next = null;
+
+        ListNode left = sortList(head);
+        ListNode right = sortList(rightList);
+
+        return mergeTwoList(left, right);
+    }
+
+    private ListNode mergeTwoList(ListNode left, ListNode right) {
+        ListNode dummy = new ListNode(-1);
+        ListNode curNode = dummy;
+        while (left != null && right != null) {
+            if (left.val <= right.val) {
+                curNode.next = left;
+                left = left.next;
+            } else {
+                curNode.next = right;
+                right = right.next;
+            }
+            curNode = curNode.next;
+        }
+        curNode.next = left != null ? left : right;
+        return dummy.next;
+
+    }
+
+    private ListNode findMiddleNode(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode walker = head;
+        ListNode runner = head.next.next;
+        while (runner != null && runner.next != null) {
+            walker = walker.next;
+            runner = runner.next.next;
+        }
+        return walker;
+    }
 }
 ```
