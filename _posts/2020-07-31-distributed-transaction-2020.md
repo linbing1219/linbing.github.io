@@ -96,6 +96,8 @@ BASE解决了CAP中理论没有网络延迟，在BASE中用软状态和最终一
 
 ## TCC
 
+![](https://github.com/linbing1219/linbing1219.github.io/raw/master/img/2020-07-31-distributed-transaction-2020/tcc_pic.jpg)
+
 * Try阶段：尝试执行,完成所有业务检查（一致性）,预留必须业务资源（准隔离性）
 
 * Confirm阶段：确认执行真正执行业务，不作任何业务检查，只使用Try阶段预留的业务资源，Confirm操作满足幂等性。要求具备幂等设计，Confirm失败后需要进行重试。
