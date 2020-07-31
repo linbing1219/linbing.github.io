@@ -76,6 +76,8 @@ BASE解决了CAP中理论没有网络延迟，在BASE中用软状态和最终一
 
 ## 2PC
 
+![](https://github.com/linbing1219/linbing1219.github.io/raw/master/img/2020-07-31-distributed-transaction-2020/2pc_pic.jpg)
+
 * 第一阶段：事务管理器要求每个涉及到事务的数据库预提交(precommit)此操作，并反映是否可以提交。这个时候相当于相关资源已经加锁，等待commit是否锁。
 
 * 第二阶段：事务管理器要求每个数据库提交数据，或者回滚数据。
@@ -94,7 +96,12 @@ BASE解决了CAP中理论没有网络延迟，在BASE中用软状态和最终一
 
 ## TCC
 
-- TODO
+* Try阶段：尝试执行,完成所有业务检查（一致性）,预留必须业务资源（准隔离性）
+
+* Confirm阶段：确认执行真正执行业务，不作任何业务检查，只使用Try阶段预留的业务资源，Confirm操作满足幂等性。要求具备幂等设计，Confirm失败后需要进行重试。
+
+* Cancel阶段：取消执行，释放Try阶段预留的业务资源
+Cancel操作满足幂等性Cancel阶段的异常和Confirm阶段异常处理方案基本上一致。
 
 ## 参考资料
 
