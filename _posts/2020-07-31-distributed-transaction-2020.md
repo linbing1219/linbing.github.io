@@ -4,7 +4,7 @@ title:      分布式事务及其解决方案
 subtitle:    "\"distribution transaction\""
 date:       2020-07-31
 author:     Jimmy
-header-img: img/2020-07-08-second-kill-2020/sec_kill_backgroud.jpg
+header-img: img/2020-07-31-distributed-transaction-2020/distributed_transaction_backgroud.jpg
 catalog: true
 tags:
     - 分布式架构
